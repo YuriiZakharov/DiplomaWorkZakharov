@@ -1,0 +1,132 @@
+﻿@model Place
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+@{
+    ViewData["Title"] = "Edit Place";
+
+    string lang = HttpContextAccessor.HttpContext.Session.GetString("Lang");
+    string editPlaceHeader, nameLabel, productTypeLabel, workingHoursLabel, viewGalleryButton, saveChangesButton;
+    string medical, food, psychological, clothes, financial, housing;
+
+    if (lang == "en")
+    {
+        editPlaceHeader = "Edit Place";
+        nameLabel = "Name:";
+        productTypeLabel = "Product Type:";
+        workingHoursLabel = "Working Hours:";
+        viewGalleryButton = "View Gallery";
+        saveChangesButton = "Save Changes";
+
+        // Product Types in English
+        medical = "Medical";
+        food = "Food";
+        psychological = "Psychological";
+        clothes = "Clothes";
+        financial = "Financial";
+        housing = "Housing";
+    }
+    else if (lang == "ua")
+    {
+        editPlaceHeader = "Редагувати Місце";
+        nameLabel = "Назва:";
+        productTypeLabel = "Тип Продукту:";
+        workingHoursLabel = "Робочі Години:";
+        viewGalleryButton = "Переглянути Галерею";
+        saveChangesButton = "Зберегти Зміни";
+
+        // Product Types in Ukrainian
+        medical = "Медичний";
+        food = "Їжа";
+        psychological = "Психологічний";
+        clothes = "Одяг";
+        financial = "Фінансовий";
+        housing = "Житло";
+    }
+    else
+    {
+        // Default to English if session value is not set or unknown
+        editPlaceHeader = "Edit Place";
+        nameLabel = "Name:";
+        productTypeLabel = "Product Type:";
+        workingHoursLabel = "Working Hours:";
+        viewGalleryButton = "View Gallery";
+        saveChangesButton = "Save Changes";
+
+        // Default Product Types in English
+        medical = "Medical";
+        food = "Food";
+        psychological = "Psychological";
+        clothes = "Clothes";
+        financial = "Financial";
+        housing = "Housing";
+    }
+}
+
+<style>
+    body {
+        background-color: #f0fff0; /* Pale green background */
+    }
+
+    .form-container {
+        background-color: #f7f7f7;
+        padding: 20px;
+        border-radius: 5px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+    }
+
+    .form-control {
+        margin-bottom: 10px;
+    }
+
+    .btn-primary {
+        background-color: #007bff;
+        border-color: #007bff;
+    }
+
+    .btn-secondary {
+        background-color: #6c757d;
+        border-color: #6c757d;
+    }
+
+        .btn-primary:hover, .btn-secondary:hover {
+            opacity: 0.8;
+        }
+</style>
+
+<h2>@editPlaceHeader</h2>
+
+<form method="post" action="/Home/UpdatePlace" class="form-container">
+    <input type="hidden" asp-for="Id" />
+    <!-- Hidden fields -->
+    <input type="hidden" asp-for="Address" />
+    <input type="hidden" asp-for="HostId" />
+
+    <div class="form-group">
+        <label asp-for="Name">@nameLabel</label>
+        <input asp-for="Name" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="ProductType">@productTypeLabel</label>
+        <select asp-for="ProductType" class="form-control">
+            <option value="Medical">@medical</option>
+            <option value="Food">@food</option>
+            <option value="Psychological">@psychological</option>
+            <option value="Clothes">@clothes</option>
+            <option value="Financial">@financial</option>
+            <option value="Housing">@housing</option>
+        </select>
+        <span asp-validation-for="ProductType" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label>@workingHoursLabel</label><br />
+        <input type="time" id="startTime" name="startTime" value="@(Model.WorkingHours.Split('-')[0])" required class="form-control d-inline w-auto" />
+        <span> - </span>
+        <input type="time" id="endTime" name="endTime" value="@(Model.WorkingHours.Split('-')[1])" required class="form-control d-inline w-auto" />
+    </div>
+    <a asp-controller="Image" asp-action="Gallery" asp-route-id="@Model.Id" class="btn btn-secondary">@viewGalleryButton</a>
+
+    <button type="submit" class="btn btn-primary">@saveChangesButton</button>
+</form>

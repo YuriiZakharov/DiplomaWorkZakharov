@@ -1,0 +1,68 @@
+﻿@using DiplomaWork_WebSite.Models
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+@model List<Image>
+
+@{
+    string lang = HttpContextAccessor.HttpContext.Session.GetString("Lang");
+    string galleryHeader, noImagesFoundMessage, deleteButton, uploadNewImageButton, uploadButton;
+
+    if (lang == "en")
+    {
+        galleryHeader = "Gallery";
+        noImagesFoundMessage = "No images found.";
+        deleteButton = "Delete";
+        uploadNewImageButton = "Upload New Image";
+        uploadButton = "Upload";
+    }
+    else if (lang == "ua")
+    {
+        galleryHeader = "Галерея";
+        noImagesFoundMessage = "Зображень не знайдено.";
+        deleteButton = "Видалити";
+        uploadNewImageButton = "Завантажити нове зображення";
+        uploadButton = "Завантажити";
+    }
+    else
+    {
+        // Default to English if session value is not set or unknown
+        galleryHeader = "Gallery";
+        noImagesFoundMessage = "No images found.";
+        deleteButton = "Delete";
+        uploadNewImageButton = "Upload New Image";
+        uploadButton = "Upload";
+    }
+}
+
+<h2>@galleryHeader</h2>
+
+<!-- Displaying images -->
+@if (Model.Any())
+{
+    <div class="row">
+        @foreach (var image in Model)
+        {
+            var imageSrc = $"data:image;base64,{image.ImageCode}";
+            <div class="col-md-4">
+                <img src="@imageSrc" class="img-fluid mb-2" alt="Image" />
+                <form method="post" action="/Image/DeleteImage">
+                    <input type="hidden" name="id" value="@image.Id" />
+                    <button type="submit" class="btn btn-danger">@deleteButton</button>
+                </form>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <p>@noImagesFoundMessage</p>
+}
+
+<!-- Form for uploading new image -->
+<form method="post" enctype="multipart/form-data" action="/Image/AddImage">
+    <input type="hidden" name="placeId" value="@ViewBag.PlaceId" />
+    <div class="form-group mt-3">
+        <label for="imageFile">@uploadNewImageButton</label>
+        <input type="file" class="form-control-file" id="imageFile" name="imageFile" />
+    </div>
+    <button type="submit" class="btn btn-primary">@uploadButton</button>
+</form>

@@ -1,0 +1,134 @@
+﻿@model User
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+@{
+    ViewData["Title"] = "User Profile";    
+
+    string lang = HttpContextAccessor.HttpContext.Session.GetString("Lang");
+    string email, name, lastName, phoneNum, picture, chatable, useOfData, password, save;
+
+    if (lang == "en")
+    {
+        email = "Email";
+        name = "Name";
+        lastName = "Last Name";
+        phoneNum = "Phone Number";
+        picture = "New Picture";
+        chatable = "Is Chatable";
+        useOfData = "I agree to the use of my personal data";
+        password = "Password";
+        save = "Save Changes";
+    }
+    else if (lang == "ua")
+    {
+        email = "Електрона пошта";
+        name = "Ім'я";
+        lastName = "Прізвище";
+        phoneNum = "Номер телефону";
+        picture = "Нове Фото";
+        chatable = "Можливість спілкування";
+        useOfData = "Я погоджуюсь на використання моїх персональних даних";
+        password = "Пароль";
+        save = "Зберегти зміни";
+    }
+    else
+    {
+        // Default to English if session value is not set or unknown
+        email = "Email";
+        name = "Name";
+        lastName = "Last Name";
+        phoneNum = "Phone Number";
+        picture = "New Picture";
+        chatable = "Is Chatable";
+        useOfData = "I agree to the use of my personal data";
+        password = "Password";
+        save = "Save Changes";
+    }
+}
+
+<style>
+    /* Add this CSS to your existing stylesheet or create a new one */
+
+    /* Style for the page body */
+    body {
+        background-color: #f0fff0; /* Pale green background */
+    }
+
+    /* Style for the profile picture */
+    #user-picture {
+        text-align: center;
+    }
+
+        #user-picture img {
+            width: 200px;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+
+    /* Style for form inputs */
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    input[type="file"] {
+        width: 100%;
+        padding: 8px;
+        margin: 5px 0;
+        box-sizing: border-box;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+
+    /* Style for submit button */
+    button[type="submit"] {
+        background-color: #007bff;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+        /* Hover effect for submit button */
+        button[type="submit"]:hover {
+            opacity: 0.8;
+        }
+</style>
+
+<h1>User Profile</h1>
+
+<div id="user-picture">
+    <img src="@Model.Picture" alt="User Picture" />
+</div>
+
+<form method="post" enctype="multipart/form-data">
+    <input type="hidden" name="Id" value="@Model.Id" />
+    <div>
+        <label for="name">@name:</label>
+        <input type="text" id="name" name="name" value="@Model.Name" required />
+    </div>
+    <div>
+        <label for="lastName">@lastName:</label>
+        <input type="text" id="lastName" name="lastName" value="@Model.LastName" required />
+    </div>
+    <div>
+        <label for="email">@email:</label>
+        <input type="email" id="email" name="email" value="@Model.Email" required />
+    </div>
+    <div>
+        <label for="phoneNum">@phoneNum:</label>
+        <input type="text" id="phoneNum" name="phoneNum" value="@Model.PhoneNum" />
+    </div>
+    <div>
+        <input type="checkbox" class="form-check-input" id="chatableCheckbox" name="chatableCheckbox" asp-for="IsChatable">
+        <label class="form-check-label" for="chatableCheckbox">@chatable</label>
+    </div>
+    <div>
+        <label for="password">@password:</label>
+        <input type="password" id="password" name="password" required />
+    </div>
+    <div>
+        <label for="picture">@picture:</label>
+        <input type="file" id="picture" name="picture" accept="image/*" />
+    </div>
+    <button type="submit">@save</button>
+</form>

@@ -1,0 +1,155 @@
+﻿@using DiplomaWork_WebSite.Models
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+@model List<Place>
+
+@{
+    string lang = HttpContextAccessor.HttpContext.Session.GetString("Lang");
+    string placesHeader, filterLabel, searchLabel, allOption, medicalOption, foodOption, psychologicalOption, clothesOption, financialOption, housingOption;
+
+    if (lang == "en")
+    {
+        placesHeader = "Places";
+        filterLabel = "Filter by Product Type:";
+        searchLabel = "Search:";
+        allOption = "All";
+        medicalOption = "Medical";
+        foodOption = "Food";
+        psychologicalOption = "Psychological";
+        clothesOption = "Clothes";
+        financialOption = "Financial";
+        housingOption = "Housing";
+    }
+    else if (lang == "ua")
+    {
+        placesHeader = "Місця";
+        filterLabel = "Фільтрувати за типом продукції:";
+        searchLabel = "Пошук:";
+        allOption = "Всі";
+        medicalOption = "Медичні";
+        foodOption = "Харчові";
+        psychologicalOption = "Психологічні";
+        clothesOption = "Одяг";
+        financialOption = "Фінансові";
+        housingOption = "Житлові";
+    }
+    else
+    {
+        // Default to English if session value is not set or unknown
+        placesHeader = "Places";
+        filterLabel = "Filter by Product Type:";
+        searchLabel = "Search:";
+        allOption = "All";
+        medicalOption = "Medical";
+        foodOption = "Food";
+        psychologicalOption = "Psychological";
+        clothesOption = "Clothes";
+        financialOption = "Financial";
+        housingOption = "Housing";
+    }
+}
+
+<h2>@placesHeader</h2>
+
+<!-- Выпадающий список для фильтрации по типу продукции -->
+<div class="form-group mb-3">
+    <label for="productTypeFilter">@filterLabel</label>
+    <select id="productTypeFilter" class="form-control" onchange="filterPlaces()">
+        <option value="">@allOption</option>
+        <option value="Medical">@medicalOption</option>
+        <option value="Food">@foodOption</option>
+        <option value="Psychological">@psychologicalOption</option>
+        <option value="Clothes">@clothesOption</option>
+        <option value="Financial">@financialOption</option>
+        <option value="Housing">@housingOption</option>
+    </select>
+</div>
+
+<!-- Поле ввода для фильтрации по названию, типу продукции и адресу -->
+<div class="form-group mb-3">
+    <label for="searchInput">@searchLabel</label>
+    <input type="text" id="searchInput" class="form-control" onkeyup="filterPlaces()" placeholder="Search by name, product type, or address...">
+</div>
+
+<ul id="places-list">
+    @foreach (var place in Model)
+    {
+        <li class="place-item" data-place-id="@place.Id" data-product-type="@place.ProductType" data-name="@place.Name" data-address="@place.Address">
+            <span>@place.Name - @place.ProductType</span>
+        </li>
+    }
+</ul>
+
+<style>
+
+    body {
+        font-family: Arial, sans-serif;
+        line-height: 1.6;
+        padding: 20px;
+        background-color: #f0fff0;
+    }
+
+    #places-list {
+        list-style-type: none;
+        padding: 0;
+        margin-top: 20px;
+    }
+
+    .place-item {
+        cursor: pointer;
+        margin-bottom: 10px;
+        padding: 5px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        background-color: #f9f9f9;
+    }
+
+        .place-item:hover {
+            background-color: #e0e0e0;
+        }
+</style>
+
+<script>
+    function filterPlaces() {
+        // Получаем значение фильтра по типу продукции
+        var selectedProductType = document.getElementById('productTypeFilter').value.toLowerCase();
+
+        // Получаем значение поискового запроса
+        var searchQuery = document.getElementById('searchInput').value.toLowerCase();
+
+        // Получаем все элементы списка мест
+        var placeItems = document.querySelectorAll('.place-item');
+
+        // Перебираем все элементы списка и скрываем или отображаем их в зависимости от выбранного типа продукции и поискового запроса
+        placeItems.forEach(function (item) {
+            var productType = item.getAttribute('data-product-type').toLowerCase();
+            var name = item.getAttribute('data-name').toLowerCase();
+            var address = item.getAttribute('data-address').toLowerCase();
+
+            var isVisible = true;
+
+            // Проверяем условия фильтрации
+            if (selectedProductType !== '' && productType !== selectedProductType) {
+                isVisible = false;
+            }
+
+            if (searchQuery !== '' &&
+                (name.indexOf(searchQuery) === -1 && productType.indexOf(searchQuery) === -1 && address.indexOf(searchQuery) === -1)) {
+                isVisible = false;
+            }
+
+            // Устанавливаем видимость элемента в зависимости от условий фильтрации
+            item.style.display = isVisible ? 'block' : 'none';
+        });
+    }
+
+    // Обработчик клика на элемент списка для редактирования места
+    var placeItems = document.querySelectorAll('.place-item');
+
+    placeItems.forEach(function (item) {
+        item.addEventListener('click', function () {
+            var placeId = item.getAttribute('data-place-id');
+            // Перенаправлення на сторінку створення запиту з параметром placeId
+            window.location.href = '/Request/CreateRequest?selectedPlaceId=' + placeId;
+        });
+    });
+</script>

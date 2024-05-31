@@ -1,0 +1,88 @@
+﻿@model IEnumerable<ChatViewModel>
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+@{
+    ViewData["Title"] = "Chat List";
+
+    string lang = HttpContextAccessor.HttpContext.Session.GetString("Lang");
+    string chatListHeader, userImageHeader, userNameHeader, userLastNameHeader, userPlacesHeader, viewChatButton, noChatsFoundMessage, backToHomeButton;
+
+    if (lang == "en")
+    {
+        chatListHeader = "Chat List";
+        userImageHeader = "User Image";
+        userNameHeader = "User Name";
+        userLastNameHeader = "User Last Name";
+        userPlacesHeader = "User Places";
+        viewChatButton = "View Chat";
+        noChatsFoundMessage = "No chats found.";
+        backToHomeButton = "Back to Home";
+    }
+    else if (lang == "ua")
+    {
+        chatListHeader = "Список чатів";
+        userImageHeader = "Зображення Користувача";
+        userNameHeader = "Ім'я Користувача";
+        userLastNameHeader = "Прізвище Користувача";
+        userPlacesHeader = "Місця Користувача";
+        viewChatButton = "Переглянути Чат";
+        noChatsFoundMessage = "Чатів не знайдено.";
+        backToHomeButton = "Повернутися на головну";
+    }
+    else
+    {
+        // Default to English if session value is not set or unknown
+        chatListHeader = "Chat List";
+        userImageHeader = "User Image";
+        userNameHeader = "User Name";
+        userLastNameHeader = "User Last Name";
+        userPlacesHeader = "User Places";
+        viewChatButton = "View Chat";
+        noChatsFoundMessage = "No chats found.";
+        backToHomeButton = "Back to Home";
+    }
+}
+
+<h2>@chatListHeader</h2>
+
+@if (Model.Any())
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>@userImageHeader</th>
+                <th>@userNameHeader</th>
+                <th>@userLastNameHeader</th>
+                <th>@userPlacesHeader</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var chat in Model)
+            {
+                <tr>
+                    <td>
+                        <img src="data:image/jpeg;base64,@chat.UserImageBase64" alt="User Image" style="max-width: 100px; max-height: 100px;" />
+                    </td>
+                    <td>@chat.UserName</td>
+                    <td>@chat.UserLastName</td>
+                    <td>
+                        <ul>
+                            @foreach (var place in chat.UserPlaces)
+                            {
+                                <li>@place.Name - @place.Address</li>
+                            }
+                        </ul>
+                    </td>
+                    <td>
+                        <a asp-controller="Chat" asp-action="ViewChat" asp-route-chatId="@chat.ChatId" class="btn btn-primary">@viewChatButton</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>@noChatsFoundMessage</p>
+}
+
+<a asp-controller="Home" asp-action="Index" class="btn btn-primary">@backToHomeButton</a>

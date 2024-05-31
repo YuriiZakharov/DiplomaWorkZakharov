@@ -1,0 +1,282 @@
+﻿@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+@{
+    ViewData["Title"] = "Home Page";   
+
+    string lang = HttpContextAccessor.HttpContext.Session.GetString("Lang");
+    string gallery, close, chat;
+
+    if (lang == "en")
+    {
+        gallery = "Go to Gallery";
+        close = "Close";
+        chat = "Start Chat";
+    }
+    else if (lang == "ua")
+    {
+        gallery = "До Галереї";
+        close = "Закрити";
+        chat = "Почати Спілкування";
+    }
+    else
+    {
+        gallery = "Go to Gallery";
+        close = "Close";
+        chat = "Start Chat";
+    }
+}
+
+<style>
+    /* Add this CSS to your existing stylesheet or create a new one */
+
+    /* Style for the page body */
+    body {
+        background-color: #f0fff0; /* Pale green background */
+    }
+
+    /* Style for the map container */
+    #map {
+        height: 900px;
+        width: 100%;
+        float: left;
+    }
+
+    /* Style for the sidebar */
+    #sidebar {
+        display: none;
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 30%;
+        height: 100%;
+        background-color: #f9f9f9;
+        padding: 10px;
+        border-left: 1px solid #ccc;
+        box-shadow: -5px 0 5px -5px rgba(0, 0, 0, 0.5);
+        overflow-y: auto;
+    }
+
+        /* Style for sidebar buttons */
+        #sidebar button {
+            margin-bottom: 5px;
+        }
+</style>
+
+<!-- Create a container for the map -->
+<div id="map"></div>
+
+<!-- Create a sidebar for place information -->
+<div id="sidebar">
+    <div id="place-info"></div>
+    <button onclick="goToGallery()">@gallery</button>
+    <button onclick="closeSidebar()">@close</button>
+</div>
+
+
+
+<script>
+    var sidebarOpen = false;
+    var map;
+    var doubleClickTimeout;
+    var markers = [];
+    var selectedPlaceId = null;
+
+    function initMap() {
+        var mapOptions = {
+            center: { lat: 48.3794, lng: 31.1656 }, // Center of Ukraine
+            zoom: 6
+        };
+
+        map = new google.maps.Map(document.getElementById('map'), mapOptions);      
+        
+        map.addListener('dblclick', function(event) {
+            clearTimeout(doubleClickTimeout);
+            doubleClickTimeout = setTimeout(function() {
+                // Чіткий подвійний клік не відбувся, просто скидуємо таймер
+                clearTimeout(doubleClickTimeout);
+            }, 300);
+
+            // Викликати функцію для підтвердження створення нового місця
+            confirmCreatePlace(event.latLng);
+        });
+
+        var sessionLatitude;
+        var sessionLongitude;
+
+        function confirmCreatePlace(latLng) {
+            var confirmed = confirm('Do you want to create a new place at this location?');
+            if (confirmed) {
+                // Зробити запит на сервер для отримання адреси за координатами
+                fetch('https://maps.googleapis.com/maps/api/geocode/json?latlng=' + latLng.lat() + ',' + latLng.lng() + '&key=AIzaSyCHr7im0qihe0T0cY9Z_ent5CWPT61s184')
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.results && data.results.length > 0) {
+                            // Отримати перший результат як адресу
+                            var address = data.results[0].formatted_address;
+
+                            // Перенаправити на сторінку створення місця з передачею адреси через параметр запиту
+                            window.location.href = '/Home/Create?address=' + encodeURIComponent(address);
+                        } else {
+                            alert('Unable to retrieve address for the selected location.');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching address:', error);
+                        alert('An error occurred while fetching address.');
+                    });
+            }
+        }
+
+
+
+        fetch('https://localhost:44392/api/Place/places')
+            .then(response => response.json())
+            .then(places => {
+                places.forEach(place => {                    
+                    var geocoder = new google.maps.Geocoder();
+                    geocoder.geocode({ address: place.address }, function (results, status) {
+                        if (status === 'OK') {
+                            var location = results[0].geometry.location;
+
+                            var iconUrl = getIconUrl(place.productType);
+
+                            var marker = new google.maps.Marker({
+                                position: location,
+                                map: map,
+                                title: place.name,
+                                icon: iconUrl,
+                                id: place.id
+                            });
+
+                            markers.push(marker);
+
+                            var infoWindow = new google.maps.InfoWindow({
+                                content: '<strong>' + place.name + '</strong><br>' + place.address,
+                            });
+
+                            marker.addListener('click', function () {
+                            selectedPlaceId = marker.id;
+                            // Здійснюємо запит за даними про місце
+                            fetch('https://localhost:44392/api/Place/' + place.id)
+                                .then(response => response.json())
+                                .then(placeData => {
+                                    // Здійснюємо запит за даними про власника
+                                    fetch('https://localhost:44392/api/User/' + placeData.hostId)
+                                        .then(response => response.json())
+                                        .then(userData => {                                            
+                                           // Формуємо контент для відображення в боковій панелі
+                                           var contentString = '<div><strong>' + placeData.name + '</strong><br>' + 
+                                            'Address: ' + placeData.address + '<br>' +
+                                            'Product Type: ' + placeData.productType + '<br>' +
+                                            'Owner: ' + userData.name + ' ' + userData.lastName + '<br>' +
+                                            'Email: ' + userData.email + '<br>' +
+                                            'Phone: ' + userData.phoneNum + '</div>';
+
+                                            if (userData.isChatable || place.HostId == @ViewBag.UserId) {
+                                                contentString += '<button id="startChatBtn">@chat</button>';
+                                            }
+                    
+                                            infoWindow.setContent(contentString);
+                                            infoWindow.open(map, marker);
+                                            
+                                            document.getElementById('place-info').innerHTML = contentString;
+                                            openSidebar();
+
+                                            document.getElementById('startChatBtn').addEventListener('click', function() {
+                                            saveOwnerIdAndStartChat(placeData.hostId);
+
+                                            fetchPlaceImages(placeId);
+                                            });
+                                        })
+                                        .catch(error => console.error('Error fetching user data:', error));
+                                })
+                                .catch(error => console.error('Error fetching place data:', error));
+                        });
+                        } else {
+                            console.error('Geocode was not successful for the following reason: ' + status);
+                        }
+                    });
+                });
+                clickMarkerById(selectedPlaceId);
+            })
+            .catch(error => console.error('Error fetching places:', error));
+
+        function getIconUrl(productType) {
+            // Define icons based on ProductType
+            switch (productType) {
+                case 'Medical':
+                    return 'http://maps.gstatic.com/mapfiles/ms2/micons/hospitals.png';
+                case 'Food':
+                    return 'http://maps.gstatic.com/mapfiles/ms2/micons/restaurant.png';
+                case 'Psychological':
+                    return 'http://maps.gstatic.com/mapfiles/ms2/micons/arts.png';
+                case 'Clothes':
+                    return 'http://maps.gstatic.com/mapfiles/ms2/micons/shopping.png';
+                case 'Financial':
+                    return 'http://maps.gstatic.com/mapfiles/ms2/micons/dollar.png';
+                case 'Housing':
+                    return 'http://maps.gstatic.com/mapfiles/ms2/micons/homegardenbusiness.png';                
+                default:
+                    return 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png';
+            }
+        }       
+    }
+    
+
+    function saveOwnerIdAndStartChat(hostId) {
+    fetch('/Home/SaveOwnerIdAndStartChat?hostId=' + hostId, {
+        method: 'POST'
+    })
+    .then(response => {
+        if (!response.ok) {
+            console.error('Failed to start chat');
+        } else {
+            window.location.href = '/Chat/StartChat'; // Перенаправлення на сторінку чату
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+
+    function openSidebar() {
+        if (!sidebarOpen) {
+            document.getElementById('sidebar').style.display = 'block';
+            sidebarOpen = true;
+        }
+    }
+
+    function closeSidebar() {
+        if (sidebarOpen) {
+            document.getElementById('sidebar').style.display = 'none';
+            sidebarOpen = false;
+        }
+    }      
+
+    function goToGallery() {
+        if (selectedPlaceId) {
+            window.location.href = '/Image/GalleryNoEdit?placeId=' + selectedPlaceId;
+        } else {
+            alert('No place selected.');
+        }
+    }
+
+    function loadScript() {
+        var script = document.createElement('script');
+        script.src = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyCHr7im0qihe0T0cY9Z_ent5CWPT61s184&callback=initMap';
+        document.body.appendChild(script);
+    }
+
+    window.onload = loadScript;
+
+    function clickMarkerById(placeId) {
+        // Отримайте маркер за його id
+        var marker = markers.find(marker => marker.id === placeId);
+        if (marker) {
+            google.maps.event.trigger(marker, 'click');
+        }
+    }
+
+    // Отримайте параметр placeId з URL
+    var urlParams = new URLSearchParams(window.location.search);
+    var selectedPlaceId = urlParams.get('selectedPlaceId');
+
+    
+</script>

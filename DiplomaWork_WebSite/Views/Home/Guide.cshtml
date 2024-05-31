@@ -1,0 +1,125 @@
+﻿@using Microsoft.AspNetCore.Http
+@inject IHttpContextAccessor HttpContextAccessor
+@{
+    string lang = HttpContextAccessor.HttpContext.Session.GetString("Lang");
+    string introductionHeader, gettingStartedHeader, gettingStartedDescription, siteFeaturesHeader, siteFeaturesDescription, faqsHeader, faq1Question, faq1Answer, step1, step2, step3, step4, feature1, feature2, feature3, feature4, feature5, feature6, feature7;
+
+    if (lang == "en")
+    {
+        introductionHeader = "User Guide";
+        gettingStartedHeader = "Getting Started";
+        gettingStartedDescription = "To get started, follow these simple steps:";
+        siteFeaturesHeader = "Site Features";
+        siteFeaturesDescription = "Our site offers the following features:";
+        faqsHeader = "FAQs";
+        faq1Question = "Q: How do I create a new place?";
+        faq1Answer = "A: To create a new place, simply double-click on the map at the desired location and follow the prompts, or use Create Place Page with comfortable address autofill.";
+        step1 = "Step 1: Navigate to the Home Page using the top menu";
+        step2 = "Step 2: Explore the Map";
+        step3 = "Step 3: Interact with Place Markers by clicking on them";
+        step4 = "Step 4: Chat with users by creating chats through pop up menu after clicking on a marker";
+        feature1 = "Feature 1: Interactive Map Navigation";
+        feature2 = "Feature 2: Create new place using comfortable address autofill";
+        feature3 = "Feature 3: Double-Click to choose address for place";
+        feature4 = "Feature 4: Edit and delete places and pictures from their galleries";
+        feature5 = "Feature 5: Chat with place owners";
+        feature6 = "Feature 6: Leave aid requests";
+        feature7 = "Feature 7: Manage your account info";
+    }
+    else if (lang == "ua")
+    {
+        introductionHeader = "Керівництво Користувача";
+        gettingStartedHeader = "Початок роботи";
+        gettingStartedDescription = "Для початку роботи слідується цим простим крокам:";
+        siteFeaturesHeader = "Особливості сайту";
+        siteFeaturesDescription = "Наш сайт пропонує наступні можливості:";
+        faqsHeader = "Поширені запитання";
+        faq1Question = "П: Як створити нове місце?";
+        faq1Answer = "В: Для створення нового місця просто подвійно клацніть на карті в бажаному місці та дотримуйтесь вказівок або скористайтеся сторінкою Створити місце зручним заповненням адреси.";
+        step1 = "Крок 1: Перейдіть на домашню сторінку, використовуючи верхнє меню";
+        step2 = "Крок 2: Вивчіть карту";
+        step3 = "Крок 3: Взаємодійте з місцевими маркерами, клацаючи на них";
+        step4 = "Крок 4: Чатайтеся з користувачами, створюючи чати через спливаюче меню після клацання на маркер";
+        feature1 = "Особливість 1: Інтерактивна навігація по карті";
+        feature2 = "Особливість 2: Створення нового місця зручним заповненням адреси";
+        feature3 = "Особливість 3: Подвійне клацання для вибору адреси для місця";
+        feature4 = "Особливість 4: Редагування та видалення місць та зображень з їх галерей";
+        feature5 = "Особливість 5: Чат з власниками місць";
+        feature6 = "Особливість 6: Залишати запити на допомогу";
+        feature7 = "Особливість 7: Управління інформацією вашого облікового запису";
+    }
+    else
+    {
+        // Default to English if session value is not set or unknown
+        introductionHeader = "User Guide";
+        gettingStartedHeader = "Getting Started";
+        gettingStartedDescription = "To get started, follow these simple steps:";
+        siteFeaturesHeader = "Site Features";
+        siteFeaturesDescription = "Our site offers the following features:";
+        faqsHeader = "FAQs";
+        faq1Question = "Q: How do I create a new place?";
+        faq1Answer = "A: To create a new place, simply double-click on the map at the desired location and follow the prompts, or use Create Place Page with comfortable address autofill.";
+        step1 = "Step 1: Navigate to the Home Page using the top menu";
+        step2 = "Step 2: Explore the Map";
+        step3 = "Step 3: Interact with Place Markers by clicking on them";
+        step4 = "Step 4: Chat with users by creating chats through pop up menu after clicking on a marker";
+        feature1 = "Feature 1: Interactive Map Navigation";
+        feature2 = "Feature 2: Create new place using comfortable address autofill";
+        feature3 = "Feature 3: Double-Click to choose address for place";
+        feature4 = "Feature 4: Edit and delete places and pictures from their galleries";
+        feature5 = "Feature 5: Chat with place owners";
+        feature6 = "Feature 6: Leave aid requests";
+        feature7 = "Feature 7: Manage your account info";
+    }
+}
+
+<!DOCTYPE html>
+<html lang="@lang">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Guide</title>
+    <style>
+        /* Add your custom CSS styles here */
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        h1, h2, h3 {
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+    <h1>@introductionHeader</h1>
+
+    <h2>@gettingStartedHeader</h2>
+    <p>@gettingStartedDescription</p>
+    <ol>
+        <li>@step1</li>
+        <li>@step2</li>
+        <li>@step3</li>
+        <li>@step4</li>
+    </ol>
+
+    <h2>@siteFeaturesHeader</h2>
+    <p>@siteFeaturesDescription</p>
+    <ul>
+        <li>@feature1</li>
+        <li>@feature2</li>
+        <li>@feature3</li>
+        <li>@feature4</li>
+        <li>@feature5</li>
+        <li>@feature6</li>
+        <li>@feature7</li>
+    </ul>
+
+    <iframe width="560" height="315" src="https://www.youtube.com/embed/1WlecaNexcI?si=DLR66lDb36UtaZFI" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+    
+    <h2>@faqsHeader</h2>
+    <h3>@faq1Question</h3>
+    <p>@faq1Answer</p>
+</body>
+</html>

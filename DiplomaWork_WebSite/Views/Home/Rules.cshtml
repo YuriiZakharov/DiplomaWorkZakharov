@@ -1,0 +1,108 @@
+﻿@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+@{
+    ViewData["Title"] = "Rules";
+    Layout = "~/Views/Shared/_LayoutNoLinks.cshtml";
+
+    string lang = HttpContextAccessor.HttpContext.Session.GetString("Lang");
+    string termsOfUseHeader, no18PlusContent, doNotCreateNonExistentCenters, deleteClosedCenters, politenessRules, doNotUseProfanity, doNotSpreadUntrueInfo, attentionHeader, warning, rule1, rule2, rule3, rule4, rule5, rule6, warningText;
+
+    if (lang == "en")
+    {
+        termsOfUseHeader = "Terms of Use";
+        no18PlusContent = "No 18+ content:";
+        doNotCreateNonExistentCenters = "Do not create non-existent centers:";
+        deleteClosedCenters = "Delete centers that have been closed:";
+        politenessRules = "Adhere to politeness rules when communicating with center owners:";
+        doNotUseProfanity = "Do not use profanity:";
+        doNotSpreadUntrueInfo = "Do not spread untrue information:";
+        attentionHeader = "ATTENTION!";
+        warning = "Warning:";
+        rule1 = "Please refrain from posting any content containing adult material.";
+        rule2 = "Be responsible and do not create centers that do not exist in real life.";
+        rule3 = "If you are the owner of a center, please remove it from the site if it has been closed.";
+        rule4 = "Be polite and respect other users of the site.";
+        rule5 = "Avoid using profanity and communicate respectfully.";
+        rule6 = "Be objective and do not spread unverified information.";
+        warningText = "During the receipt of humanitarian aid, individuals may be required to present their identification documents.";
+    }
+    else if (lang == "ua")
+    {
+        termsOfUseHeader = "Умови використання";
+        no18PlusContent = "Без вмісту 18+:";
+        doNotCreateNonExistentCenters = "Не створюйте неіснуючі центри:";
+        deleteClosedCenters = "Видаліть закриті центри:";
+        politenessRules = "Дотримуйтесь правил ввічливості під час спілкування з власниками центрів:";
+        doNotUseProfanity = "Не використовуйте ненормативну лексику:";
+        doNotSpreadUntrueInfo = "Не розповсюджуйте неправдиву інформацію:";
+        attentionHeader = "УВАГА!";
+        warning = "Попередження:";
+        rule1 = "Будь ласка, утримуйтеся від публікації будь-якого контенту для дорослих.";
+        rule2 = "Будьте відповідальними та не створюйте центри, яких не існує в реальному житті.";
+        rule3 = "Якщо ви є власником центру, будь ласка, видаліть його з сайту, якщо він був закритий.";
+        rule4 = "Будьте ввічливими та поважайте інших користувачів сайту.";
+        rule5 = "Уникайте використання нецензурної лексики та спілкуйтеся з повагою.";
+        rule6 = "Будьте об'єктивними та не поширюйте неперевірену інформацію.";
+        warningText = "Під час отримання гуманітарної допомоги може знадобитися пред'явлення документів для ідентифікації особи.";
+    }
+    else
+    {
+        // Default to English if session value is not set or unknown
+        termsOfUseHeader = "Terms of Use";
+        no18PlusContent = "No 18+ content:";
+        doNotCreateNonExistentCenters = "Do not create non-existent centers:";
+        deleteClosedCenters = "Delete centers that have been closed:";
+        politenessRules = "Adhere to politeness rules when communicating with center owners:";
+        doNotUseProfanity = "Do not use profanity:";
+        doNotSpreadUntrueInfo = "Do not spread untrue information:";
+        attentionHeader = "ATTENTION!";
+        warning = "Warning:";
+        rule1 = "Please refrain from posting any content containing adult material.";
+        rule2 = "Be responsible and do not create centers that do not exist in real life.";
+        rule3 = "If you are the owner of a center, please remove it from the site if it has been closed.";
+        rule4 = "Be polite and respect other users of the site.";
+        rule5 = "Avoid using profanity and communicate respectfully.";
+        rule6 = "Be objective and do not spread unverified information.";
+        warningText = "During the receipt of humanitarian aid, individuals may be required to present their identification documents.";
+    }
+}
+
+<!DOCTYPE html>
+<html lang="@lang">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        ol {
+            margin-left: 20px;
+        }
+
+        li {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>@termsOfUseHeader</h1>
+    <ol>
+        <li><strong>@no18PlusContent</strong> @rule1</li>
+        <li><strong>@doNotCreateNonExistentCenters</strong> @rule2</li>
+        <li><strong>@deleteClosedCenters</strong> @rule3</li>
+        <li><strong>@politenessRules</strong> @rule4</li>
+        <li><strong>@doNotUseProfanity</strong> @rule5</li>
+        <li><strong>@doNotSpreadUntrueInfo</strong> @rule6</li>
+        <li><strong>@attentionHeader</strong></li>
+    </ol>
+
+    <p><strong>@warning</strong> @warningText</p>
+</body>
+</html>

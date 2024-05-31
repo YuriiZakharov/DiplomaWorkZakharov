@@ -1,0 +1,200 @@
+﻿@model Place
+
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+
+@{
+    string lang = HttpContextAccessor.HttpContext.Session.GetString("Lang");
+    string createPlaceHeader, nameLabel, productTypeLabel, addressLabel, workingHoursLabel, ownershipFormLabel, createButton;
+    Dictionary<string, string> productTypes = new Dictionary<string, string>();
+    Dictionary<string, string> ownershipForms = new Dictionary<string, string>();
+
+    if (lang == "en")
+    {
+        createPlaceHeader = "Create New Place";
+        nameLabel = "Name:";
+        productTypeLabel = "Product Type:";
+        addressLabel = "Address:";
+        workingHoursLabel = "Working Hours:";
+        ownershipFormLabel = "Ownership Form:";
+        createButton = "Create";
+
+        // Product Types
+        productTypes.Add("Medical", "Medical");
+        productTypes.Add("Food", "Food");
+        productTypes.Add("Psychological", "Psychological");
+        productTypes.Add("Clothes", "Clothes");
+        productTypes.Add("Financial", "Financial");
+        productTypes.Add("Housing", "Housing");
+
+        // Ownership Forms
+        ownershipForms.Add("Sole proprietorship", "Sole proprietorship");
+        ownershipForms.Add("Partnership", "Partnership");
+        ownershipForms.Add("Limited liability company", "Limited liability company");
+        ownershipForms.Add("Private corporation", "Private corporation");
+        ownershipForms.Add("Cooperative", "Cooperative");
+        ownershipForms.Add("Nonprofit corporation", "Nonprofit corporation");
+        ownershipForms.Add("Benefit corporation", "Benefit corporation");
+        ownershipForms.Add("Close corporation", "Close corporation");
+        ownershipForms.Add("C corporation", "C corporation");
+        ownershipForms.Add("S Corporation", "S Corporation");
+    }
+    else if (lang == "ua")
+    {
+        createPlaceHeader = "Створити нове місце";
+        nameLabel = "Ім'я:";
+        productTypeLabel = "Тип продукту:";
+        addressLabel = "Адреса:";
+        workingHoursLabel = "Робочі години:";
+        ownershipFormLabel = "Форма власності:";
+        createButton = "Створити";
+
+        // Product Types
+        productTypes.Add("Medical", "Медичний");
+        productTypes.Add("Food", "Їжа");
+        productTypes.Add("Psychological", "Психологічний");
+        productTypes.Add("Clothes", "Одяг");
+        productTypes.Add("Financial", "Фінансовий");
+        productTypes.Add("Housing", "Житло");
+
+        // Ownership Forms
+        ownershipForms.Add("Sole proprietorship", "Індивідуальний підприємець");
+        ownershipForms.Add("Partnership", "Партнерство");
+        ownershipForms.Add("Limited liability company", "Товариство з обмеженою відповідальністю");
+        ownershipForms.Add("Private corporation", "Приватне акціонерне товариство");
+        ownershipForms.Add("Cooperative", "Кооператив");
+        ownershipForms.Add("Nonprofit corporation", "Некомерційне підприємство");
+        ownershipForms.Add("Benefit corporation", "Благодійне товариство");
+        ownershipForms.Add("Close corporation", "Закрите акціонерне товариство");
+        ownershipForms.Add("C corporation", "Корпорація");
+        ownershipForms.Add("S Corporation", "Корпорація S");
+    }
+    else
+    {
+        // Default to English if session value is not set or unknown
+        createPlaceHeader = "Create New Place";
+        nameLabel = "Name:";
+        productTypeLabel = "Product Type:";
+        addressLabel = "Address:";
+        workingHoursLabel = "Working Hours:";
+        ownershipFormLabel = "Ownership Form:";
+        createButton = "Create";
+
+        // Product Types
+        productTypes.Add("Medical", "Medical");
+        productTypes.Add("Food", "Food");
+        productTypes.Add("Psychological", "Psychological");
+        productTypes.Add("Clothes", "Clothes");
+        productTypes.Add("Financial", "Financial");
+        productTypes.Add("Housing", "Housing");
+
+        // Ownership Forms
+        ownershipForms.Add("Sole proprietorship", "Sole proprietorship");
+        ownershipForms.Add("Partnership", "Partnership");
+        ownershipForms.Add("Limited liability company", "Limited liability company");
+        ownershipForms.Add("Private corporation", "Private corporation");
+        ownershipForms.Add("Cooperative", "Cooperative");
+        ownershipForms.Add("Nonprofit corporation", "Nonprofit corporation");
+        ownershipForms.Add("Benefit corporation", "Benefit corporation");
+        ownershipForms.Add("Close corporation", "Close corporation");
+        ownershipForms.Add("C corporation", "C corporation");
+        ownershipForms.Add("S Corporation", "S Corporation");
+    }
+}
+
+<style>
+    /* Add this CSS to your existing stylesheet or create a new one */
+
+    /* Style for the page body */
+    body {
+        background-color: #f0fff0; /* Pale green background */
+    }
+
+    /* Style for form inputs */
+    .form-control {
+        margin-bottom: 10px;
+    }
+
+    /* Style for submit button */
+    .btn-primary {
+        background-color: #007bff;
+        border-color: #007bff;
+    }
+
+        /* Hover effect for submit button */
+        .btn-primary:hover {
+            opacity: 0.8;
+        }
+</style>
+
+<h2>@createPlaceHeader</h2>
+
+<form method="post">
+    <div class="form-group">
+        <label asp-for="Name">@nameLabel</label>
+        <input asp-for="Name" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="ProductType">@productTypeLabel</label>
+        <select asp-for="ProductType" class="form-control">
+            @foreach (var productType in productTypes)
+            {
+                <option value="@productType.Key">@productType.Value</option>
+            }
+        </select>
+        <span asp-validation-for="ProductType" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label>@addressLabel</label>
+        <input id="autocomplete" name="Address" placeholder="Enter your address" type="text" class="form-control" value="@(Model.Address ?? "")"></input>
+        <span asp-validation-for="Address" class="text-danger"></span>
+    </div>
+
+    <input type="hidden" id="latitude" name="Latitude" />
+    <input type="hidden" id="longitude" name="Longitude" />
+
+    <div class="form-group">
+        <label asp-for="WorkingHours">@workingHoursLabel</label>
+        <input asp-for="WorkingHours" class="form-control" />
+        <span asp-validation-for="WorkingHours" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="OwnershipForm">@ownershipFormLabel</label>
+        <select asp-for="OwnershipForm" class="form-control">
+            @foreach (var ownershipForm in ownershipForms)
+            {
+                <option value="@ownershipForm.Key">@ownershipForm.Value</option>
+            }
+        </select>
+        <span asp-validation-for="OwnershipForm" class="text-danger"></span>
+    </div>
+
+    <input type="hidden" asp-for="HostId" />
+
+    <button type="submit" class="btn btn-primary">@createButton</button>
+</form>
+
+@section Scripts {
+    <script>
+        function initAutocomplete() {
+            var input = document.getElementById('autocomplete');
+            var options = {
+                types: ['address'], // Provide address autocomplete
+                componentRestrictions: { country: 'UA' } // Restrict address search to Ukraine
+            };
+            var autocomplete = new google.maps.places.Autocomplete(input, options);
+
+            // Add event listener to update autocomplete results after each character input
+            input.addEventListener('input', function () {
+                var event = new Event('change');
+                this.dispatchEvent(event);
+            });
+        }
+
+        // Run the initAutocomplete() function after page load
+        google.maps.event.addDomListener(window, 'load', initAutocomplete);
+    </script>
+}

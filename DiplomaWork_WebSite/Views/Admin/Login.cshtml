@@ -1,0 +1,114 @@
+﻿@{
+    ViewData["Title"] = "Login";
+    Layout = "~/Views/Shared/_LayoutNoLinks.cshtml";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <style>
+        body {
+            background-color: #f0fff0; /* Pale green background */
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            max-width: 400px;
+            margin: auto;
+            padding: 20px;
+            background-color: #f7f7f7;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-top: 50px;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+            .form-group label {
+                display: block;
+                margin-bottom: 5px;
+            }
+
+            .form-group input {
+                width: 100%;
+                padding: 10px;
+                border: 1px solid #ccc;
+                border-radius: 4px;
+            }
+
+        .btn {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .btn-primary {
+            background-color: #007bff;
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+        }
+
+            .btn-primary:hover, .btn-secondary:hover {
+                opacity: 0.8;
+            }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <script>
+        function hashInput(event) {
+            event.preventDefault(); // Запобігає відправленню форми
+
+            // Отримуємо значення полів
+            const passwordField = document.getElementById('password');
+            const adminCodeField = document.getElementById('adminCode');
+
+            // Хешуємо значення за допомогою SHA256
+            const hashedPassword = CryptoJS.SHA256(passwordField.value).toString();
+            const hashedAdminCode = CryptoJS.SHA256(adminCodeField.value).toString();
+
+            // Змінюємо значення полів на хешовані
+            passwordField.value = hashedPassword;
+            adminCodeField.value = hashedAdminCode;
+
+            // Відправляємо форму
+            event.target.submit();
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h2>Login</h2>
+        <form method="post" onsubmit="hashInput(event)">
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="Email" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="Password" required>
+            </div>
+            <div class="form-group">
+                <label for="adminCode">Admin Code:</label>
+                <input type="text" id="adminCode" name="AdminCode" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Login</button>
+        </form>
+    </div>
+</body>
+</html>

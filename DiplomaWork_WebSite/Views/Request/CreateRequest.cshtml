@@ -1,0 +1,75 @@
+﻿@model DiplomaWork_WebSite.Models.Request
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+@{
+    ViewData["Title"] = "Create Request";
+
+    string lang = HttpContextAccessor.HttpContext.Session.GetString("Lang");
+    string text, title, submit;
+
+    if (lang == "en")
+    {
+        text = "Text";
+        title = "Create Request";
+        submit = "Submit";
+    }
+    else if (lang == "ua")
+    {
+        text = "Текст";
+        title = "Створити Запит";
+        submit = "Відправити";
+    }
+    else
+    {
+        text = "Text";
+        title = "Create Request";
+        submit = "Submit";
+    }
+}
+
+<style>
+    body {
+        background-color: #f0fff0; /* Pale green background */
+    }
+
+    .form-container {
+        background-color: #f7f7f7;
+        padding: 20px;
+        border-radius: 5px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+    }
+
+    .form-control {
+        margin-bottom: 10px;
+    }
+
+    .btn-primary {
+        background-color: #007bff;
+        border-color: #007bff;
+    }
+
+        .btn-primary:hover {
+            opacity: 0.8;
+        }
+</style>
+
+<h2>@title</h2>
+
+<form method="post" class="form-container">
+    <div class="form-group">
+        <label asp-for="Text">@text</label>
+        <textarea asp-for="Text" class="form-control" rows="3"></textarea>
+        <span asp-validation-for="Text" class="text-danger"></span>
+    </div>
+
+    <!-- Hidden fields for other properties -->
+    <input type="hidden" asp-for="Id" />
+    <input type="hidden" asp-for="CreatedDate" />
+    <input type="hidden" asp-for="UserId" />
+    <input type="hidden" asp-for="PlaceId" />
+    <input type="hidden" asp-for="IsAccepted" />
+    <input type="hidden" asp-for="IsDeclined" />
+    <input type="hidden" asp-for="DeclineText" value=" " />
+
+    <button type="submit" class="btn btn-primary">@submit</button>
+</form>

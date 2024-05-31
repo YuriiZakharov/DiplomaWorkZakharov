@@ -1,0 +1,94 @@
+﻿@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome</title>
+    <style>
+        /* Add your custom CSS styles here */
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .welcome-message {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        .recommendations {
+            font-size: 18px;
+            margin-top: 30px;
+        }
+
+            .recommendations a {
+                color: #007bff;
+                text-decoration: none;
+            }
+    </style>
+</head>
+<body>
+    <div class="container">
+        @{
+
+            string lang = HttpContextAccessor.HttpContext.Session.GetString("Lang");
+            string welcomeHeader, welcomeMessage, recommendationsHeader, rules1, rules2, rules3, guide1, guide2, guide3;
+
+            if (lang == "en")
+            {
+                welcomeHeader = "Welcome to Our Website!";
+                welcomeMessage = "We're glad you're here. Let us guide you through your journey.";
+                recommendationsHeader = "We recommend:";
+                rules1 = "Read our";
+                rules2 = "Rules and Regulations";
+                rules3 = "to ensure a pleasant experience.";
+                guide1 = "Explore our";
+                guide2 = "User Guide";
+                guide3 = "for tips and instructions on using our website.";
+            }
+            else if (lang == "ua")
+            {
+                welcomeHeader = "Ласкаво просимо на наш веб-сайт!";
+                welcomeMessage = "Ми раді, що ви тут. Дозвольте нам провести вас через вашу подорож.";
+                recommendationsHeader = "Ми рекомендуємо:";
+                rules1 = "Прочитайте наші";
+                rules2 = "Правила та Положення";
+                rules3 = "для забезпечення приємного досвіду.";
+                guide1 = "Досліджуйте наш";
+                guide2 = "Посібник Користувача";
+                guide3 = "для порад та інструкцій з використання нашого веб-сайту.";
+            }
+            else
+            {
+                // Default to English if session value is not set or unknown
+                welcomeHeader = "Welcome to Our Website!";
+                welcomeMessage = "We're glad you're here. Let us guide you through your journey.";
+                recommendationsHeader = "We recommend:";
+                rules1 = "Read our";
+                rules2 = "Rules and Regulations";
+                rules3 = "to ensure a pleasant experience.";
+                guide1 = "Explore our";
+                guide2 = "User Guide";
+                guide3 = "for tips and instructions on using our website.";
+            }
+        }
+
+        <h1>@welcomeHeader</h1>
+        <p class="welcome-message">@welcomeMessage</p>
+
+        <div class="recommendations">
+            <p>@recommendationsHeader</p>
+            <ul>
+                <li>@rules1 <a href="/Home/Rules">@rules2 </a>@rules3</li>
+                <li>@guide1 <a href="/Home/Guide">@guide2</a> @guide3</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>

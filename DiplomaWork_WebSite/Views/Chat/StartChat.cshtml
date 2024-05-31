@@ -1,0 +1,98 @@
+﻿@model List<Message>
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+
+@{
+    ViewData["Title"] = "Chat Page";
+
+    string lang = HttpContextAccessor.HttpContext.Session.GetString("Lang");
+    string pageTitle, messagePlaceholder, sendButtonLabel;
+
+    if (lang == "en")
+    {
+        pageTitle = "Chat Page";
+        messagePlaceholder = "Type your message here...";
+        sendButtonLabel = "Send";
+    }
+    else if (lang == "ua")
+    {
+        pageTitle = "Сторінка чату";
+        messagePlaceholder = "Напишіть ваше повідомлення тут...";
+        sendButtonLabel = "Надіслати";
+    }
+    else
+    {
+        // Default to English if session value is not set or unknown
+        pageTitle = "Chat Page";
+        messagePlaceholder = "Type your message here...";
+        sendButtonLabel = "Send";
+    }
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>@pageTitle</title>
+    <style>
+        .message {
+            margin: 5px 0;
+            padding: 10px;
+            border-radius: 10px;
+        }
+
+            .message.left {
+                background-color: #f0f0f0;
+                text-align: left;
+            }
+
+            .message.right {
+                background-color: #d7f8d7;
+                text-align: right;
+                border-top-left-radius: 10px;
+            }
+
+                .message.right p {
+                    border-top-right-radius: 10px;
+                }
+    </style>
+</head>
+<body>
+    <div method="post">
+        <div id="chat-messages">
+            @foreach (var message in Model)
+            {
+                var userId = (int)ViewData["UserId"];
+                <div class="message @(message.UserId == userId ? "right" : "left")">
+                    <p>@message.Text</p>
+                    <span class="time">@message.CreatedDate</span>
+                </div>
+            }
+        </div>
+
+        <form id="message-form" method="post" action="/Chat/AddMessage">
+            <input type="hidden" id="userId" name="UserId" value="@ViewData["UserId"]" />
+            <input type="hidden" id="chatId" name="ChatId" value="@ViewData["ChatId"]" />
+            <input type="hidden" id="createdDate" name="CreatedDate" value="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss")" />
+            <input type="text" id="message-text" name="Text" placeholder="@messagePlaceholder" />
+            <button type="submit">@sendButtonLabel</button>
+        </form>
+    </div>
+    <script>
+        // Оновлювати список кожні 5 секунд
+        setInterval(function () {
+            var chatId = @ViewData["ChatId"];
+            $.ajax({
+                url: "https://localhost:44392/api/Message/chat/" + chatId,
+                type: "GET",
+                success: function (data) {
+                    displayMessages(data, @ViewData["UserId"]); // Відобразити нові повідомлення
+                },
+                error: function () {
+                    console.error("Failed to retrieve chat messages.");
+                }
+            });
+        }, 5000); // 5000 мс = 5 секунд
+    </script>
+
+</body>
+</html>

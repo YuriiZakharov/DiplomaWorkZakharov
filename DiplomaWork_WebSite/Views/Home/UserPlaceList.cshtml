@@ -1,0 +1,165 @@
+﻿@model List<Place>
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+
+@{  
+    string lang = HttpContextAccessor.HttpContext.Session.GetString("Lang");
+    string userPlacesHeader, nameLabel, productTypeLabel, requestsButton, editButton, deleteButton;
+
+    if (lang == "en")
+    {
+        userPlacesHeader = "User Places";
+        nameLabel = "Name";
+        productTypeLabel = "Product Type";
+        requestsButton = "Requests";
+        editButton = "Edit";
+        deleteButton = "Delete";
+    }
+    else if (lang == "ua")
+    {
+        userPlacesHeader = "Місця Користувача";
+        nameLabel = "Назва";
+        productTypeLabel = "Тип Продукту";
+        requestsButton = "Запити";
+        editButton = "Редагувати";
+        deleteButton = "Видалити";
+    }
+    else
+    {
+        // Default to English if session value is not set or unknown
+        userPlacesHeader = "User Places";
+        nameLabel = "Name";
+        productTypeLabel = "Product Type";
+        requestsButton = "Requests";
+        editButton = "Edit";
+        deleteButton = "Delete";
+    }
+}
+<style>
+    /* Add your custom CSS styles here */
+
+    /* Style for the page body */
+    body {
+        font-family: Arial, sans-serif;
+        line-height: 1.6;
+        padding: 20px;
+        background-color: #f0fff0; /* Pale green background */
+    }
+
+    /* Style for tables */
+    .table {
+        width: 100%;
+        margin-bottom: 1rem;
+        color: #212529;
+    }
+
+        /* Style for table headers */
+        .table th,
+        .table td {
+            padding: 0.75rem;
+            vertical-align: top;
+            border-top: 1px solid #dee2e6;
+        }
+
+        /* Hover effect for table rows */
+        .table tbody tr:hover {
+            background-color: rgba(0, 123, 255, 0.25);
+        }
+
+    /* Style for buttons */
+    .btn {
+        display: inline-block;
+        font-weight: 400;
+        color: #212529;
+        text-align: center;
+        vertical-align: middle;
+        cursor: pointer;
+        border: 1px solid transparent;
+        padding: 0.375rem 0.75rem;
+        font-size: 1rem;
+        line-height: 1.5;
+        border-radius: 0.25rem;
+        transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    }
+
+    /* Primary button style */
+    .btn-primary {
+        color: #fff;
+        background-color: #007bff;
+        border-color: #007bff;
+    }
+
+        /* Hover effect for primary button */
+        .btn-primary:hover {
+            color: #fff;
+            background-color: #0069d9;
+            border-color: #0062cc;
+        }
+
+    /* Danger button style */
+    .btn-danger {
+        color: #fff;
+        background-color: #dc3545;
+        border-color: #dc3545;
+    }
+
+        /* Hover effect for danger button */
+        .btn-danger:hover {
+            color: #fff;
+            background-color: #c82333;
+            border-color: #bd2130;
+        }
+</style>
+
+<h2>@userPlacesHeader</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>@nameLabel</th>
+            <th>@productTypeLabel</th>
+            <th></th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var place in Model)
+        {
+            <tr>
+                <td>@place.Name</td>
+                <td>@place.ProductType</td>
+                <td>
+                    <form asp-controller="Request" asp-action="GetPlaceRequests" method="get">
+                        <input type="hidden" name="placeId" value="@place.Id" />
+                        <button type="submit" class="btn btn-primary">@requestsButton</button>
+                    </form>
+                </td>
+                <td>
+                    <a class="btn btn-primary" href="/Home/UpdatePlace/@place.Id">@editButton</a>
+                    <button class="btn btn-danger" onclick="deletePlace(@place.Id)">@deleteButton</button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@section Scripts {
+    <script>
+        function deletePlace(placeId) {
+            fetch(`/Home/DeletePlace/${placeId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            }).then(response => {
+                if (response.ok) {
+                    window.location.reload();
+                } else {
+                    console.error('Failed to delete place');
+                }
+            }).catch(error => {
+                console.error('Error:', error);
+            });
+        }
+    </script>
+}
+

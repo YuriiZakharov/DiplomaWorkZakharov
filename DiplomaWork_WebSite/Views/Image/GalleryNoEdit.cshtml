@@ -1,0 +1,44 @@
+﻿@using DiplomaWork_WebSite.Models
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+@model List<Image>
+
+@{
+    string lang = HttpContextAccessor.HttpContext.Session.GetString("Lang");
+    string galleryHeader, noImagesFoundMessage;
+
+    if (lang == "en")
+    {
+        galleryHeader = "Gallery";
+        noImagesFoundMessage = "No images found.";
+    }
+    else if (lang == "ua")
+    {
+        galleryHeader = "Галерея";
+        noImagesFoundMessage = "Зображення не знайдено.";
+    }
+    else
+    {
+        // Default to English if session value is not set or unknown
+        galleryHeader = "Gallery";
+        noImagesFoundMessage = "No images found.";
+    }
+}
+
+<h2>@galleryHeader</h2>
+
+@if (Model.Any())
+{
+    <div class="row">
+        @foreach (var image in Model)
+        {
+            var imageSrc = $"data:image;base64,{image.ImageCode}";
+            <div class="col-md-4">
+                <img src="@imageSrc" class="img-fluid mb-2" alt="Image" />
+            </div>
+        }
+    </div>
+}
+else
+{
+    <p>@noImagesFoundMessage</p>
+}

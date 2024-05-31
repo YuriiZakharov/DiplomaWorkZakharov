@@ -1,0 +1,201 @@
+﻿@using static DiplomaWork_WebSite.Controllers.RequestController
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+@model UserRequestsViewModel
+
+@{
+    string lang = HttpContextAccessor.HttpContext.Session.GetString("Lang");
+    string userRequestsHeader, placeNameLabel, productTypeLabel, requestTextLabel, creationDateLabel, statusLabel, declineReasonLabel, noRequestsFoundMessage, acceptedLabel, declinedLabel, postedLabel, deleteResponseButton;
+
+    if (lang == "en")
+    {
+        userRequestsHeader = "User Requests";
+        placeNameLabel = "Place Name";
+        productTypeLabel = "Product Type";
+        requestTextLabel = "Request Text";
+        creationDateLabel = "Creation Date";
+        statusLabel = "Status";
+        declineReasonLabel = "Decline Reason";
+        noRequestsFoundMessage = "No requests found.";
+        acceptedLabel = "Accepted";
+        declinedLabel = "Declined";
+        postedLabel = "Posted";
+        deleteResponseButton = "Delete Response";
+    }
+    else if (lang == "ua")
+    {
+        userRequestsHeader = "Запити користувача";
+        placeNameLabel = "Назва місця";
+        productTypeLabel = "Тип продукту";
+        requestTextLabel = "Текст запиту";
+        creationDateLabel = "Дата створення";
+        statusLabel = "Статус";
+        declineReasonLabel = "Причина відхилення";
+        noRequestsFoundMessage = "Запити відсутні.";
+        acceptedLabel = "Прийнято";
+        declinedLabel = "Відхилено";
+        postedLabel = "Опубліковано";
+        deleteResponseButton = "Видалити відповідь";
+    }
+    else
+    {
+        // Default to English if session value is not set or unknown
+        userRequestsHeader = "User Requests";
+        placeNameLabel = "Place Name";
+        productTypeLabel = "Product Type";
+        requestTextLabel = "Request Text";
+        creationDateLabel = "Creation Date";
+        statusLabel = "Status";
+        declineReasonLabel = "Decline Reason";
+        noRequestsFoundMessage = "No requests found.";
+        acceptedLabel = "Accepted";
+        declinedLabel = "Declined";
+        postedLabel = "Posted";
+        deleteResponseButton = "Delete Response";
+    }
+}
+
+<style>
+    body {
+        background-color: #f0fff0; /* Pale green background */
+    }
+
+    .form-container {
+        background-color: #f7f7f7;
+        padding: 20px;
+        border-radius: 5px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+    }
+
+    .form-control {
+        margin-bottom: 10px;
+    }
+
+    .btn-primary {
+        background-color: #007bff;
+        border-color: #007bff;
+    }
+
+    .btn-success {
+        background-color: #28a745;
+        border-color: #28a745;
+    }
+
+    .btn-danger {
+        background-color: #dc3545;
+        border-color: #dc3545;
+    }
+
+        .btn-primary:hover, .btn-success:hover, .btn-danger:hover {
+            opacity: 0.8;
+        }
+
+    .table {
+        width: 100%;
+        margin-bottom: 1rem;
+        color: #212529;
+    }
+
+        .table th, .table td {
+            padding: 0.75rem;
+            vertical-align: top;
+            border-top: 1px solid #dee2e6;
+        }
+
+        .table thead th {
+            vertical-align: bottom;
+            border-bottom: 2px solid #dee2e6;
+        }
+
+        .table tbody + tbody {
+            border-top: 2px solid #dee2e6;
+        }
+
+    .text-success {
+        color: #28a745 !important;
+    }
+
+    .text-danger {
+        color: #dc3545 !important;
+    }
+
+    .badge {
+        padding: 0.5em 1em;
+        font-size: 1em;
+        border-radius: 0.25rem;
+        color: #fff;
+    }
+
+    .badge-success {
+        background-color: #28a745;
+    }
+
+    .badge-danger {
+        background-color: #dc3545;
+    }
+
+    .badge-primary {
+        background-color: #007bff;
+    }
+</style>
+
+<h2>@userRequestsHeader</h2>
+
+@if (Model != null && Model.Requests != null && Model.Requests.Count > 0)
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>@placeNameLabel</th>
+                <th>@productTypeLabel</th>
+                <th>@requestTextLabel</th>
+                <th>@creationDateLabel</th>
+                <th>@statusLabel</th>
+                <th>@declineReasonLabel</th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (var i = 0; i < Model.Requests.Count; i++)
+            {
+                <tr>
+                    <td>@Model.Places[i]?.Name</td>
+                    <td>@Model.Places[i]?.ProductType</td>
+                    <td>@Model.Requests[i].Text</td>
+                    <td>@Model.Requests[i].CreatedDate.ToString("yyyy-MM-dd")</td>
+                    <td>
+                        @{
+                            if (Model.Requests[i].IsAccepted)
+                            {
+                                <span class="badge badge-success" style="color: black;">@acceptedLabel</span>
+                            }
+                            else if (Model.Requests[i].IsDeclined)
+                            {
+                                <span class="badge badge-danger" style="color: black;">@declinedLabel</span>
+                            }
+                            else
+                            {
+                                <span class="badge badge-primary" style="color: black;">@postedLabel</span>
+                            }
+                        }
+                    </td>
+                    <td>
+                        @if (Model.Requests[i].IsDeclined)
+                        {
+                            @Model.Requests[i].DeclineText
+                        }
+                    </td>
+                    <td>
+                        <form asp-action="DeleteResponse" method="post">
+                            <input type="hidden" name="RequestId" value="@Model.Requests[i].Id" />
+                            <button type="submit" class="btn btn-danger">@deleteResponseButton</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>@noRequestsFoundMessage</p>
+}

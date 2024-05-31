@@ -1,0 +1,67 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Map Page</title>
+
+    <!-- Add your Google Maps API key -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY&libraries=places"></script>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        #menu {
+            background-color: #333;
+            color: #fff;
+            padding: 10px;
+            text-align: center;
+        }
+
+        #map {
+            height: 400px; /* Set the desired height for your map */
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="menu">
+        <h1>My Map App</h1>
+        <!-- Add any menu items or navigation links here -->
+    </div>
+
+    <div id="map"></div>
+
+    <script>
+        // Initialize the map
+        function initMap() {
+            // Replace with the coordinates of your desired location
+            var myLatLng = { lat: 37.7749, lng: -122.4194 };
+
+            // Create a map centered at the specified location
+            var map = new google.maps.Map(document.getElementById('map'), {
+                center: myLatLng,
+                zoom: 12 // Adjust the zoom level as needed
+            });
+
+            // Add a marker at the specified location
+            var marker = new google.maps.Marker({
+                position: myLatLng,
+                map: map,
+                title: 'My Location'
+            });
+        }
+    </script>
+
+    <!-- Load the map on page load -->
+    <script async defer
+            src="https://maps.googleapis.com/maps/api/js?key=AIzaSyADRSWmZSI0HO3vbuvaTDtvMoyELij_UNU&libraries=places&callback=initMap">
+    </script>
+
+</body>
+</html>

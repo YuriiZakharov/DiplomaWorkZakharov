@@ -1,0 +1,186 @@
+﻿@using static DiplomaWork_WebSite.Controllers.RequestController
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+@model PlaceRequestsViewModel
+
+@{
+    string lang = HttpContextAccessor.HttpContext.Session.GetString("Lang");
+    string placeRequestsHeader, userNameLabel, lastNameLabel, requestTextLabel, creationDateLabel, actionsLabel, acceptButton, declineButton, confirmDeclineButton, acceptedLabel, declinedLabel, noRequestsFoundMessage;
+
+    if (lang == "en")
+    {
+        placeRequestsHeader = "Place Requests";
+        userNameLabel = "User Name";
+        lastNameLabel = "Last Name";
+        requestTextLabel = "Request Text";
+        creationDateLabel = "Creation Date";
+        actionsLabel = "Actions";
+        acceptButton = "Accept";
+        declineButton = "Decline";
+        confirmDeclineButton = "Confirm Decline";
+        acceptedLabel = "Accepted";
+        declinedLabel = "Declined";
+        noRequestsFoundMessage = "No requests found.";
+    }
+    else if (lang == "ua")
+    {
+        placeRequestsHeader = "Запити на місця";
+        userNameLabel = "Ім'я користувача";
+        lastNameLabel = "Прізвище";
+        requestTextLabel = "Текст запиту";
+        creationDateLabel = "Дата створення";
+        actionsLabel = "Дії";
+        acceptButton = "Прийняти";
+        declineButton = "Відхилити";
+        confirmDeclineButton = "Підтвердити відхилення";
+        acceptedLabel = "Прийнято";
+        declinedLabel = "Відхилено";
+        noRequestsFoundMessage = "Запити відсутні.";
+    }
+    else
+    {
+        // Default to English if session value is not set or unknown
+        placeRequestsHeader = "Place Requests";
+        userNameLabel = "User Name";
+        lastNameLabel = "Last Name";
+        requestTextLabel = "Request Text";
+        creationDateLabel = "Creation Date";
+        actionsLabel = "Actions";
+        acceptButton = "Accept";
+        declineButton = "Decline";
+        confirmDeclineButton = "Confirm Decline";
+        acceptedLabel = "Accepted";
+        declinedLabel = "Declined";
+        noRequestsFoundMessage = "No requests found.";
+    }
+}
+
+<style>
+    body {
+        background-color: #f0fff0; /* Pale green background */
+    }
+
+    .form-container {
+        background-color: #f7f7f7;
+        padding: 20px;
+        border-radius: 5px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+    }
+
+    .form-control {
+        margin-bottom: 10px;
+    }
+
+    .btn-primary {
+        background-color: #007bff;
+        border-color: #007bff;
+    }
+
+    .btn-success {
+        background-color: #28a745;
+        border-color: #28a745;
+    }
+
+    .btn-danger {
+        background-color: #dc3545;
+        border-color: #dc3545;
+    }
+
+        .btn-primary:hover, .btn-success:hover, .btn-danger:hover {
+            opacity: 0.8;
+        }
+
+    .table {
+        width: 100%;
+        margin-bottom: 1rem;
+        color: #212529;
+    }
+
+        .table th, .table td {
+            padding: 0.75rem;
+            vertical-align: top;
+            border-top: 1px solid #dee2e6;
+        }
+
+        .table thead th {
+            vertical-align: bottom;
+            border-bottom: 2px solid #dee2e6;
+        }
+
+        .table tbody + tbody {
+            border-top: 2px solid #dee2e6;
+        }
+
+    .text-success {
+        color: #28a745 !important;
+    }
+
+    .text-danger {
+        color: #dc3545 !important;
+    }
+</style>
+
+<h2>@placeRequestsHeader</h2>
+
+@if (Model != null && Model.Requests.Count > 0)
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>@userNameLabel</th>
+                <th>@lastNameLabel</th>
+                <th>@requestTextLabel</th>
+                <th>@creationDateLabel</th>
+                <th>@actionsLabel</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var request in Model.Requests)
+            {
+                var userDetails = Model.UserDetails[request.UserId];
+                <tr>
+                    <td>@userDetails.LastName</td>
+                    <td>@userDetails.Name</td>
+                    <td>@request.Text</td>
+                    <td>@request.CreatedDate.ToString("yyyy-MM-dd")</td>
+                    <td>
+                        @if (!request.IsAccepted && !request.IsDeclined)
+                        {
+                            <form asp-action="AcceptRequest" method="post">
+                                <input type="hidden" name="RequestId" value="@request.Id" />
+                                <button type="submit" class="btn btn-success">@acceptButton</button>
+                            </form>
+                            <button class="btn btn-danger" onclick="showDeclineReason('@request.Id')">@declineButton</button>
+                            <form id="declineForm_@request.Id" asp-action="DeclineRequest" method="post" style="display: none;">
+                                <input type="hidden" name="RequestId" value="@request.Id" />
+                                <textarea name="DeclineReason" class="form-control" rows="3"></textarea>
+                                <button type="submit" class="btn btn-primary">@confirmDeclineButton</button>
+                            </form>
+                        }
+                        @if (request.IsAccepted)
+                        {
+                            <span class="text-success">@acceptedLabel</span>
+                        }
+                        else if (request.IsDeclined)
+                        {
+                            <span class="text-danger">@declinedLabel - @request.DeclineText</span>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>@noRequestsFoundMessage</p>
+}
+
+@section Scripts {
+    <script>
+        function showDeclineReason(requestId) {
+            var formId = "declineForm_" + requestId;
+            $("#" + formId).show();
+        }
+    </script>
+}
